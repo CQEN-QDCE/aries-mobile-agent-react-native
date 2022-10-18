@@ -8,9 +8,9 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
 
-import CredentialCard from '../components/misc/CredentialCard'
 import InfoBox, { InfoBoxType } from '../components/misc/InfoBox'
 import CommonDeleteModal from '../components/modals/CommonDeleteModal'
+import Record from '../components/record/Record'
 import { ToastType } from '../components/toast/BaseToast'
 import { useConfiguration } from '../contexts/configuration'
 import { DispatchAction } from '../contexts/reducers/store'
@@ -42,7 +42,7 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = ({ navigation, route
   const credential = useCredentialById(credentialId)
   const credentialConnectionLabel = getCredentialConnectionLabel(credential)
   const { TextTheme, ColorPallet } = useTheme()
-  const { OCABundle, record } = useConfiguration()
+  const { OCABundle, CredentialCardDetailHeader } = useConfiguration()
 
   const { revoked, revokedMessageDismissed } = state.credential
 
@@ -171,7 +171,12 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = ({ navigation, route
             )}
           </View>
         ) : null}
-        {credential && <CredentialCard credential={credential} style={{ marginHorizontal: 15, marginTop: 16 }} />}
+        {credential &&
+          CredentialCardDetailHeader({
+            credential: credential,
+            OCABundle: OCABundle,
+            style: { marginHorizontal: 15, marginTop: 16 },
+          })}
       </>
     )
   }
@@ -229,12 +234,8 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = ({ navigation, route
 
   return (
     <SafeAreaView style={{ flexGrow: 1 }} edges={['left', 'right']}>
-      {record({
-        header: header,
-        footer: footer,
-        fields: fields,
-        hideFieldValues: true,
-      })}
+      <Record fields={fields} header={header} footer={footer} hideFieldValues={true} />
+
       <CommonDeleteModal
         visible={isDeleteModalDisplayed}
         onSubmit={() => handleSubmitRemovePressed()}

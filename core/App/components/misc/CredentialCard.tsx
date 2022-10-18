@@ -14,18 +14,18 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import { dateFormatOptions } from '../../constants'
-import { useConfiguration } from '../../contexts/configuration'
 import { useStore } from '../../contexts/store'
 import { useTheme } from '../../contexts/theme'
 import { getCurrentLanguage } from '../../localization'
 import { GenericFn } from '../../types/fn'
-import { OCACredentialBundle } from '../../types/oca'
+import { OCABundleResolver, OCACredentialBundle } from '../../types/oca'
 import { getCredentialConnectionLabel, hashCode, hashToRGBA, parsedCredDefName } from '../../utils/helpers'
 import { luminanceForHexColour } from '../../utils/luminance'
 import { testIdWithKey } from '../../utils/testable'
 
-interface CredentialCardProps {
+export interface CredentialCardProps {
   credential: CredentialExchangeRecord
+  OCABundle: OCABundleResolver
   onPress?: GenericFn
   style?: ViewStyle
 }
@@ -42,10 +42,9 @@ const toImageSource = (source: unknown): ImageSourcePropType => {
   }
   return source as ImageSourcePropType
 }
-const CredentialCard: React.FC<CredentialCardProps> = ({ credential, style = {}, onPress = undefined }) => {
+const CredentialCard: React.FC<CredentialCardProps> = ({ credential, OCABundle, style = {}, onPress = undefined }) => {
   const { t } = useTranslation()
   const { ColorPallet, TextTheme } = useTheme()
-  const { OCABundle } = useConfiguration()
 
   const [state] = useStore()
   const [isRevoked, setIsRevoked] = useState<boolean>(false)

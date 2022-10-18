@@ -8,6 +8,7 @@ import { FlatList, View } from 'react-native'
 
 import CredentialCard from '../components/misc/CredentialCard'
 import EmptyList from '../components/misc/EmptyList'
+import { useConfiguration } from '../contexts/configuration'
 import { useTheme } from '../contexts/theme'
 import { CredentialStackParams, Screens } from '../types/navigators'
 
@@ -19,6 +20,7 @@ const ListCredentials: React.FC = () => {
   ]
   const navigation = useNavigation<StackNavigationProp<CredentialStackParams>>()
   const { ColorPallet } = useTheme()
+  const { OCABundle, CredentialCardList } = useConfiguration()
 
   return (
     <FlatList
@@ -34,10 +36,11 @@ const ListCredentials: React.FC = () => {
               marginBottom: index === credentials.length - 1 ? 45 : 0,
             }}
           >
-            <CredentialCard
-              credential={credential}
-              onPress={() => navigation.navigate(Screens.CredentialDetails, { credentialId: credential.id })}
-            />
+            {CredentialCardList({
+              credential: credential,
+              OCABundle: OCABundle,
+              onPress: () => navigation.navigate(Screens.CredentialDetails, { credentialId: credential.id }),
+            })}
           </View>
         )
       }}

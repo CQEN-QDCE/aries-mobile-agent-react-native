@@ -1,4 +1,4 @@
-import Record from './components/record/Record'
+import CredentialCard from './components/misc/CredentialCard'
 import HomeContentView from './components/views/HomeContentView'
 import { ConfigurationContext } from './contexts/configuration'
 import OnboardingPages from './screens/OnboardingPages'
@@ -14,5 +14,6 @@ export const defaultConfiguration: ConfigurationContext = {
   homeContentView: HomeContentView,
   OCABundle: new oca.DefaultOCABundleResolver().loadDefaultBundles(),
   useBiometry: UseBiometry,
-  record: Record,
+  CredentialCardList: CredentialCard,
+  CredentialCardDetailHeader: CredentialCard,
 }
