@@ -11,6 +11,7 @@ import ProofRequestDeclined from '../assets/img/proof-declined.svg'
 import Button, { ButtonType } from '../components/buttons/Button'
 import CredentialCard from '../components/misc/CredentialCard'
 import InfoBox, { InfoBoxType } from '../components/misc/InfoBox'
+import { useConfiguration } from '../contexts/configuration'
 import { DispatchAction } from '../contexts/reducers/store'
 import { useStore } from '../contexts/store'
 import { useTheme } from '../contexts/theme'
@@ -43,6 +44,7 @@ const CommonDecline: React.FC<CommonDeclineProps> = ({ navigation, route }) => {
   const { t } = useTranslation()
   const { ColorPallet, TextTheme } = useTheme()
   const [didDecline, setDidDecline] = useState<boolean>(false)
+  const { OCABundle, CredentialCardDetailHeader } = useConfiguration()
   const imageDisplayOptions = {
     fill: ColorPallet.notification.infoText,
     height: 250,
@@ -149,7 +151,7 @@ const CommonDecline: React.FC<CommonDeclineProps> = ({ navigation, route }) => {
               />
               {credential && (
                 <View style={{ marginTop: 20 }}>
-                  <CredentialCard credential={credential} />
+                  {CredentialCardDetailHeader({ credential: credential, OCABundle: OCABundle })}
                 </View>
               )}
             </ScrollView>

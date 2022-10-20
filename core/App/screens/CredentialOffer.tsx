@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import RecordLoading from '../components/animated/RecordLoading'
 import Button, { ButtonType } from '../components/buttons/Button'
 import ConnectionAlert from '../components/misc/ConnectionAlert'
-import CredentialCard from '../components/misc/CredentialCard'
+import Record from '../components/record/Record'
 import { useConfiguration } from '../contexts/configuration'
 import { useNetwork } from '../contexts/network'
 import { DispatchAction } from '../contexts/reducers/store'
@@ -47,7 +47,7 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, route }) 
   const [loading, setLoading] = React.useState<boolean>(true)
   const { assertConnectedNetwork } = useNetwork()
   const { ListItems, ColorPallet } = useTheme()
-  const { OCABundle, record } = useConfiguration()
+  const { OCABundle, CredentialCardDetailHeader } = useConfiguration()
 
   const styles = StyleSheet.create({
     headerTextContainer: {
@@ -152,9 +152,13 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, route }) 
             {t('CredentialOffer.IsOfferingYouACredential')}
           </Text>
         </View>
-        {!loading && credential && (
-          <CredentialCard credential={credential} style={{ marginHorizontal: 15, marginBottom: 16 }} />
-        )}
+        {!loading &&
+          credential &&
+          CredentialCardDetailHeader({
+            credential: credential,
+            OCABundle: OCABundle,
+            style: { marginHorizontal: 15, marginTop: 16 },
+          })}
       </>
     )
   }
@@ -196,11 +200,8 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, route }) 
   }
   return (
     <SafeAreaView style={{ flexGrow: 1 }} edges={['bottom', 'left', 'right']}>
-      {record({
-        header: header,
-        footer: footer,
-        fields: fields,
-      })}
+      <Record fields={fields} header={header} footer={footer} />
+
       <CredentialOfferAccept visible={acceptModalVisible} credentialId={credentialId} />
     </SafeAreaView>
   )
