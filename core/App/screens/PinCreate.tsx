@@ -2,19 +2,22 @@ import { useNavigation } from '@react-navigation/core'
 import { StackNavigationProp } from '@react-navigation/stack'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Platform, Keyboard, StyleSheet, Text, StatusBar, View } from 'react-native'
+import { Keyboard, Platform, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import Icon from 'react-native-vector-icons/MaterialIcons'
 
 import Button, { ButtonType } from '../components/buttons/Button'
 import PinInput from '../components/inputs/PinInput'
 import AlertModal from '../components/modals/AlertModal'
 import { minPINLength } from '../constants'
 import { useAuth } from '../contexts/auth'
+import { useConfiguration } from '../contexts/configuration'
 import { DispatchAction } from '../contexts/reducers/store'
 import { useStore } from '../contexts/store'
 import { useTheme } from '../contexts/theme'
 import { AuthenticateStackParams, Screens } from '../types/navigators'
 import { statusBarStyleForColor, StatusBarStyles } from '../utils/luminance'
+import { pinCreationValidations, PinValidationsType } from '../utils/pinCreationValidation'
 import { testIdWithKey } from '../utils/testable'
 
 interface PinCreateProps {
@@ -37,9 +40,12 @@ const PinCreate: React.FC<PinCreateProps> = ({ setAuthenticated }) => {
     title: '',
     message: '',
   })
+  const [pinOneValidations, setPinOneValidations] = useState<PinValidationsType[]>([])
+
   const navigation = useNavigation<StackNavigationProp<AuthenticateStackParams>>()
   const [, dispatch] = useStore()
   const { t } = useTranslation()
+  const { pinSecurity } = useConfiguration()
 
   const { ColorPallet, TextTheme } = useTheme()
   const style = StyleSheet.create({
@@ -69,53 +75,27 @@ const PinCreate: React.FC<PinCreateProps> = ({ setAuthenticated }) => {
     }
   }
 
-  const confirmEntry = async (x: string, y: string) => {
-    const negativePattern = /[^0-9]/g
-    if (negativePattern.test(x)) {
-      setModalState({
-        visible: true,
-        title: t('PinCreate.InvalidPIN'),
-        message: t('PinCreate.PleaseUseOnlyNumbersInYourPIN'),
-      })
-    } else if (!x.length) {
-      setModalState({
-        visible: true,
-        title: t('PinCreate.EnterPINTitle'),
-        message: t('PinCreate.YouNeedToCreateA6DigitPIN'),
-      })
-    } else if (x.length < minPINLength) {
-      setModalState({
-        visible: true,
-        title: t('PinCreate.PINTooShort'),
-        message: t('PinCreate.YourPINMustBe6DigitsInLength'),
-      })
-    } else if (negativePattern.test(y)) {
-      setModalState({
-        visible: true,
-        title: t('PinCreate.InvalidPIN'),
-        message: t('PinCreate.PleaseUseOnlyNumbersInYourPIN'),
-      })
-    } else if (!y.length) {
-      setModalState({
-        visible: true,
-        title: t('PinCreate.ReenterPINTitle'),
-        message: t('PinCreate.PleaseReenterYourPIN'),
-      })
-    } else if (y.length < minPINLength) {
-      setModalState({
-        visible: true,
-        title: t('PinCreate.PINTooShort'),
-        message: t('PinCreate.YourPINMustBe6DigitsInLength'),
-      })
-    } else if (x !== y) {
-      setModalState({
-        visible: true,
-        title: t('PinCreate.PINsDoNotMatch'),
-        message: t('PinCreate.EnteredPINsDoNotMatch'),
-      })
-    } else {
-      await passcodeCreate(x)
+  const confirmEntry = async (pinX: string, pinY: string) => {
+    for (const validation of pinOneValidations) {
+      if (validation.isInvalid) {
+        setModalState({
+          visible: true,
+          title: t('PinCreate.InvalidPIN'),
+          message: t(`PinCreate.Message.${validation.errorName}`),
+        })
+        return
+      }
     }
+    if (pinX !== pinY) {
+      setModalState({
+        visible: true,
+        title: t('PinCreate.InvalidPIN'),
+        message: t('PinCreate.PINsDoNotMatch'),
+      })
+      return
+    }
+
+    await passcodeCreate(pinX)
   }
 
   return (
@@ -131,11 +111,32 @@ const PinCreate: React.FC<PinCreateProps> = ({ setAuthenticated }) => {
         </Text>
         <PinInput
           label={t('PinCreate.EnterPINTitle')}
-          onPinChanged={setPin}
+          onPinChanged={(p: string) => {
+            setPin(p)
+            setPinOneValidations(pinCreationValidations(p, pinSecurity.rules))
+          }}
           testID={testIdWithKey('EnterPIN')}
           accessibilityLabel={t('PinCreate.EnterPIN')}
           autoFocus={true}
         />
+        {pinSecurity.displayHelper && (
+          <View style={{ marginBottom: 16 }}>
+            {pinOneValidations.map((validation, index) => {
+              return (
+                <View style={{ flexDirection: 'row' }} key={index}>
+                  {validation.isInvalid ? (
+                    <Icon name="clear" size={24} color={ColorPallet.notification.errorIcon} />
+                  ) : (
+                    <Icon name="check" size={24} color={ColorPallet.notification.success} />
+                  )}
+                  <Text style={[TextTheme.normal, { paddingLeft: 4 }]}>
+                    {t(`PinCreate.Helper.${validation.errorName}`)}
+                  </Text>
+                </View>
+              )
+            })}
+          </View>
+        )}
         <PinInput
           label={t('PinCreate.ReenterPIN')}
           onPinChanged={(p: string) => {
