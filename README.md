@@ -1,3 +1,16 @@
+<!-- ENTETE -->
+[![img](https://img.shields.io/badge/Cycle%20de%20Vie-Phase%20D%C3%A9couverte-339999)](https://www.quebec.ca/gouv/politiques-orientations/vitrine-numeriqc/accompagnement-des-organismes-publics/demarche-conception-services-numeriques)
+[![License](https://img.shields.io/badge/Licence-Apache--2.0-blue)](LICENSE)
+
+---
+
+<div>
+    <a target="_blank" href="https://www.quebec.ca/gouvernement/ministere/cybersecurite-numerique">
+      <img src="https://github.com/CQEN-QDCE/.github/blob/main/images/mcn.png" alt="Logo du Ministère de la cybersécurité et du numérique" />
+    </a>
+</div>
+<!-- FIN ENTETE -->
+
 # Aries Mobile Agent React Native
 
 Aries Mobile Agent React Native is an open source Aries mobile agent app. This is a project that has been created to focus the community's efforts towards a central open source project. Various different organizations and people have expressed interest in a open source community project to help focus efforts to help prevent duplication of work between projects. Aries Bifold is also intended to help get complex or specific use-case projects started faster by cloning and having a basis of an Aries agent.
